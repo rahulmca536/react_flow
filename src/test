@@ -1,0 +1,191 @@
+// import React from 'react'
+// import { useTable, usePagination } from "react-table";
+// import './Reacttable.css';
+// import Dropdown from '../components/dropdown.js';
+
+// import Card from 'react-bootstrap/Card';
+
+// function Table({ columns, data }) {
+
+//   const {
+//     getTableProps,
+//     getTableBodyProps,
+//     headerGroups,
+//     prepareRow,
+//     page, // Instead of using 'rows', we'll use page,
+//     // which has only the rows for the active page
+
+//     // The rest of these things are super handy, too ;)
+//     canPreviousPage,
+//     canNextPage,
+//     pageOptions,
+//     pageCount,
+//     gotoPage,
+//     nextPage,
+//     previousPage,
+//     setPageSize,
+//     state: { pageIndex, pageSize },
+//   } = useTable(
+//     {
+//       columns,
+//       data,
+//       initialState: { pageIndex: 2, pageSize: 5 },
+//     },
+//     usePagination
+//   )
+
+
+//   return (
+//     <>
+
+//       <table {...getTableProps()}>
+
+//         <tbody {...getTableBodyProps()}>
+
+//           {page.map((row, i) => {
+//             return (
+//               <tr>
+//                 <div className="container-fluid">
+                
+                
+                  
+                    
+                  
+                  
+//                   <Card body>
+//                   <div className="container">
+//                   <div className="row">
+                 
+//                         <div className="col-lg-10">
+//                         <td>
+//                           <p><strong>{row.original.head}</strong></p>
+//                           <p>{row.original.desc}</p>
+//                           </td>
+//                         </div>
+//                         <div className="col-lg-2">
+//                           <p ><Dropdown /></p>
+//                         </div>
+                        
+//                         </div>
+//                         </div>
+//                         </Card>
+                       
+                 
+                  
+                
+//                 </div>
+//               </tr>
+//             );
+//           })}
+//         </tbody>
+//       </table>
+
+//       <div className="pagination" class="text-right">
+//         <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
+//           {'Home'}
+//         </button>{' '}
+//         <button onClick={() => previousPage()} disabled={!canPreviousPage}>
+//           {'Prev'}
+//         </button>{' '}
+//         <span>
+//           Page{' '}
+//           <strong>
+//             {pageIndex + 1} of {pageOptions.length}
+//           </strong>{' '}
+//         </span>
+//         <button onClick={() => nextPage()} disabled={!canNextPage}>
+//           {'Next'}
+//         </button>{' '}
+//         <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
+//           {'End'}
+//         </button>{' '}
+
+//         {/* <span>
+//           | Go to page:{' '}
+//           <input
+//             type="number"
+//             defaultValue={pageIndex + 1}
+//             onChange={e => {
+//               const page = e.target.value ? Number(e.target.value) - 1 : 0
+//               gotoPage(page)
+//             }}
+//             style={{ width: '100px' }}
+//           />
+//         </span>{' '}
+//         <select
+//           value={pageSize}
+//           onChange={e => {
+//             setPageSize(Number(e.target.value))
+//           }}
+//         >
+//           {[10, 20, 30, 40, 50].map(pageSize => (
+//             <option key={pageSize} value={pageSize}>
+//               Show {pageSize}
+//             </option>
+//           ))}
+//         </select> */}
+//       </div>
+//     </>
+//   )
+// }
+
+// function Reacttable() {
+//   const columns = [
+//     {
+//       Header: "Name",
+//       accessor: "name",
+//     },
+//     {
+//       Header: "Age",
+//       accessor: "age",
+//     },
+//     {
+//       Header: "Email",
+//       accessor: "email",
+//     },
+//     {
+//       Header: "City",
+//       accessor: "city",
+//     },
+//   ]
+
+
+//   const {
+//     getTableProps,
+//     getTableBodyProps,
+//     headerGroups,
+//     rows,
+//     prepareRow,
+//     page,
+//     canPreviousPage,
+//     canNextPage,
+//     pageOptions,
+//     pageCount,
+//     gotoPage,
+//     nextPage,
+//     previousPage,
+//     setPageSize,
+//     state: { pageIndex, pageSize },
+//   } = useTable(
+//     {
+//       columns,
+//       data,
+//       initialState: { pageIndex: 1, pageSize: 5 },
+//     },
+//     usePagination
+//   )
+
+//   return (
+//     <div className="container">
+
+//       <Table columns={columns} data={data} />
+
+
+//     </div>
+
+
+//   )
+// }
+
+// export default Reacttable
+
