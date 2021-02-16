@@ -1,11 +1,11 @@
 import dagre from 'dagre';
-import  { isNode} from 'react-flow-renderer';
+import { isNode } from 'react-flow-renderer';
 
 
 const Layout = (elements) => {
     const dagreGraph = new dagre.graphlib.Graph();
     dagreGraph.setDefaultEdgeLabel(() => ({}));
-    
+
     dagreGraph.setGraph({ rankdir: 'TB' });
     dagreGraph.setGraph({ align: 'UL' });
     elements.forEach((el) => {
@@ -22,10 +22,10 @@ const Layout = (elements) => {
             el.targetPosition = 'top';
             el.sourcePosition = 'bottom';
 
-            el.position = { 
+            el.position = {
                 x: nodeWithPosition.x - (nodeWithPosition.width / 2),
                 y: nodeWithPosition.y - (nodeWithPosition.height / 2),
-              };        
+            };
         }
         return el;
     });

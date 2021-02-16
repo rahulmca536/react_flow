@@ -1,11 +1,14 @@
-import React, {  useState, } from 'react';
+import React, { useState, } from 'react';
 import { connect } from 'react-redux'
-import {fetchUsersSuccess } from '../redux'
-import { Modal} from 'react-bootstrap';
+import { fetchUsersSuccess, fetchroute } from '../redux'
+import { Modal } from 'react-bootstrap';
 import { getSmoothStepPath, getMarkerEnd } from 'react-flow-renderer';
 import Handle from './Handle';
-
-const Edge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, source, target, style = {}, arrowHeadType, markerEndId, data = {}, actionLoading, userData, addUsers
+import Node from './Node';
+// import routeElements from './route-elements';
+import data_convert from './data_convert';
+const position = { x: 0, y: 0 };
+const Edge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, source, target, style = {}, arrowHeadType, markerEndId, data = {}, actionLoading, userData, addUsers, route, addroute
 }) => {
 
     const [modalShow, setModalShow] = useState(false);
@@ -17,57 +20,110 @@ const Edge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPo
     function MyVerticallyCenteredModal(props) {
         const elements = props.data.userData;
 
-        const onAdd = data => {
-            const sample = "Conditional"
-            const alphabet = "abcdefghijklmnopqrstuvwxyz"
-            const randomCharacter = alphabet[Math.floor(Math.random() * alphabet.length)]
-            const randomCharacter2 = alphabet[Math.floor(Math.random() * alphabet.length)]
+        function random_num() {
+            let n = Math.floor(Math.random() * 1000) + 1;
+            let check_data = route.find(x => x.route_id === n)
+            if (check_data) {
+                return n + n;
+            } else {
+                return n;
+            }
+        }
 
-            // Add New Node
-            let node_index = elements.findIndex((el) => el.id === data.source);
-            elements.splice(node_index + 1, 0, {
-                id: data.source + randomCharacter,
-                data: { label: (<Handle data={sample} />) },
-                test:"test"
-            });
-            // Add New Exit Node
-            elements.splice(node_index + 3, 0, {
-                id: data.source + randomCharacter + randomCharacter2,
-                custom_type: 'exit',
-                data: { label: (<>Exit</>) },
-                style: { width: '55px' },
-            });
-            const cache = [...elements];
-            // Edit Existing edge to connect the new node
-            let index = cache.findIndex((el) => el.id === data.id);
-            cache[index] = { id: 'e' + data.source + '-' + data.source + randomCharacter, source: data.source, target: data.source + randomCharacter, type: 'custom', sourceHandle: data.sourceHandle, data: { target: data.source + randomCharacter, "source": data.source, id: 'e' + data.source + '-' + data.source + randomCharacter, sourceHandle: data.sourceHandle, routeId: 'e' + data.source + '-' + data.source + randomCharacter } }
-            // Add New Edge
-            cache.splice(index + 1, 0, { id: 'e' + data.source + randomCharacter + '-' + data.target, source: data.source + randomCharacter, target: data.target, type: 'custom', sourceHandle: 'a', data: { target: data.target, source: data.source + randomCharacter, id: 'e' + data.source + randomCharacter + '-' + data.target, sourceHandle: 'a', routeId: 'e' + data.source + randomCharacter + '-' + data.target } });
-            // Add New Edge for exit 
-            cache.splice(index + 2, 0, { id: 'e' + data.source + randomCharacter + '-' + data.source + randomCharacter + randomCharacter2, source: data.source + randomCharacter, target: data.source + randomCharacter + randomCharacter2, type: 'custom', sourceHandle: 'b', data: { id: 'e' + data.source + randomCharacter + '-' + data.source + randomCharacter + randomCharacter2, source: data.source + randomCharacter, target: data.source + randomCharacter + randomCharacter2, sourceHandle: 'b', routeId: 'e' + data.source + randomCharacter + '-' + data.source + randomCharacter + randomCharacter2 } });
-            addUsers(cache)
+        const onAdd = data => {
+            let routeElements = [...route]
+
+            let route_data = routeElements.find(x => x.nodes.find(y => y.id == data.source));
+            let node_data = route_data.nodes.find(x => x.id == data.source);
+            let route_index = routeElements.findIndex(x => x.nodes.find(y => y.id == data.source));
+            let target_route_data = routeElements.find(x => x.nodes.find(y => y.id == data.target));
+
+            let source_element_id = elements.find(x => x.target == route_data.nodes[0].id);
+            if (!source_element_id && route_data.route_id === target_route_data.route_id) {
+
+                let target_node_index = route_data.nodes.findIndex(x => x.id == data.target);
+
+                let new_route_nodes = [];
+
+                for (let i = target_node_index; i < route_data.nodes.length; i++) {
+                    new_route_nodes.push(route_data.nodes[i])
+                }
+                let created_node_route_id = random_num(), created_exit_route_id = random_num(), created_node_id = random_num(), created_exit_id = random_num()
+                routeElements[route_index].nodes.splice(target_node_index, route_data.nodes.length - 1)
+                routeElements[route_index].nodes.push({ id: created_node_id.toString(), data: { type: 'split', settings: { true_path: created_node_route_id.toString(), false_path: created_exit_route_id.toString() }, label: (<><Handle id={created_node_id.toString()} /></>) }, position })
+                routeElements.push({ "route_id": created_node_route_id, "nodes": new_route_nodes },
+                    { "route_id": created_exit_route_id, "nodes": [{ id: created_exit_id.toString(), data: { type: 'exit', label: (<>EXIT</>) }, position, style: { width: '55px' } }] },
+                )
+            } else {
+                let route_path1 = data.sourceHandle === 'a' ? "Yes" : data.sourceHandle === 'b' ? "No" : "";
+                let routeId1 = route_path1 === "Yes" ? node_data.data.settings.true_path : route_path1 === "No" ? node_data.data.settings.false_path : ""
+                if (route_path1) {
+
+                    let created_node_route_id = random_num(), created_exit_route_id = random_num(), created_node_id = random_num(), created_exit_id = random_num()
+                    routeElements.push({ "route_id": created_node_route_id, "nodes": [{ id: created_node_id.toString(), data: { type: 'split', settings: { true_path: routeId1, false_path: created_exit_route_id.toString() }, label: (<><Handle id={created_node_id.toString()} /></>) }, position }] },
+                        { "route_id": created_exit_route_id, "nodes": [{ id: created_exit_id.toString(), data: { type: 'exit', label: (<>EXIT</>) }, position, style: { width: '55px' } }] },
+                    )
+
+                    let node_index = route_data.nodes.findIndex(x => x.id == data.source);
+                    routeElements[route_index].nodes[node_index] = { id: node_data.id, data: { type: node_data.data.type, settings: { true_path: data.sourceHandle === 'a' ? created_node_route_id.toString() : node_data.data.settings.true_path, false_path: data.sourceHandle === 'b' ? created_node_route_id.toString() : node_data.data.settings.false_path }, label: (<><Handle id={node_data.id} /></>) }, position }
+                } else {
+
+
+                    let source_node_index = route_data.nodes.findIndex(x => x.id == data.source);
+                    let existing_nodes_array = [];
+
+                    
+                    for (let i = source_node_index+1; i < route_data.nodes.length; i++) {
+                    console.log(route_data.nodes[i]);
+                        
+                        existing_nodes_array.push(route_data.nodes[i])
+
+                    }
+                    console.log(existing_nodes_array);
+                    routeElements[route_index].nodes.splice( source_node_index + 1,route_data.nodes.length - source_node_index)
+
+
+                    let created_node_route_id = random_num(), created_exit_route_id = random_num(), created_node_id = random_num(), created_exit_id = random_num()
+                    routeElements[route_index].nodes.push({ id: created_node_id.toString(), data: { type: 'split', settings: { true_path: created_node_route_id.toString(), false_path: created_exit_route_id.toString() }, label: (<><Handle id={created_node_id.toString()} /></>) }, position })
+
+                    routeElements.push({ "route_id": created_node_route_id, "nodes": existing_nodes_array },
+                        { "route_id": created_exit_route_id, "nodes": [{ id: created_exit_id.toString(), data: { type: 'exit', label: (<>EXIT</>) }, position, style: { width: '55px' } }] },
+                    );console.log("dffdf");
+                    let source_route_data = routeElements.find(x => x.nodes.find(y => y.id == source_element_id.source));
+                    let source_node_data = source_route_data.nodes.find(x => x.id == source_element_id.source); 
+                    let source_route_index = routeElements.findIndex(x => x.nodes.find(y => y.id == source_element_id.source));
+                    let source_route_node_index = source_route_data.nodes.findIndex(x => x.id == source_element_id.source);
+                    // routeElements[source_route_index].nodes[source_route_node_index] = { id: source_node_data.id, data: { type: 'split', settings: { true_path: source_element_id.sourceHandle === 'a' ? created_node_route_id.toString() : source_node_data.data.settings.false_path, false_path: source_element_id.sourceHandle === 'b' ? created_node_route_id.toString() : source_node_data.data.settings.false_path }, label: (<><Handle id={source_node_data.id} /></>) }, position }
+                }
+            }
+
+
+
+            addroute(routeElements)
+            addUsers(data_convert(routeElements))
             setModalShow(false);
         }
 
         const onAddnode = data => {
-            const alphabet = "abcdefghijklmnopqrstuvwxyz"
-            const randomCharacter = alphabet[Math.floor(Math.random() * alphabet.length)]
-            const id = data.source + randomCharacter
-            const source = data.source + randomCharacter
-            const target = data.target
-            const cache = [...elements];
-            // Add New Node
-            let node_index = cache.findIndex((el) => el.id === data.target);
-            cache.splice(node_index, 0, { id: id, data: { label: (<>Added Node</>) }, });
-            // Edit Existing edge to connect the new node
-            let index = cache.findIndex((el) => el.id === data.id);
-            cache[index] = { id: 'e' + data.source + '-' + data.source + randomCharacter, source: data.source, target: data.source + randomCharacter, type: 'custom', sourceHandle: data.sourceHandle, data: { target: data.source + randomCharacter, "source": data.source, id: 'e' + data.source + '-' + data.source + randomCharacter, sourceHandle: data.sourceHandle, routeId: 'e' + data.source + '-' + data.source + randomCharacter } }
-            // Add New Edge
-            let edge_index = index + 1
-            cache.splice(edge_index, 0, { id: 'e' + source + '-' + target, source: source, target: target, type: 'custom', data: { target: target, source: source, id: 'e' + source + '-' + target, routeId: 'e' + source + '-' + target } },);
-            // console.log(JSON.stringify(elements))
-            addUsers(cache)
-            setModalShow(false);
+            let routeElements = [...route]
+            if (data.sourceHandle) {
+                let route_index = routeElements.findIndex(x => x.nodes.find(y => y.id == data.target));
+                let created_node_route_id = random_num()
+                routeElements[route_index].nodes.splice(0, 0, { id: created_node_route_id.toString(), data: { type: 'delay', label: (<><Node id={created_node_route_id.toString()} /> </>) }, position },)
+                addroute(routeElements)
+                addUsers(data_convert(routeElements))
+                setModalShow(false);
+            } else {
+                let route_data = routeElements.find(x => x.nodes.find(y => y.id == data.target));
+                let route_index = routeElements.findIndex(x => x.nodes.find(y => y.id == data.target));
+                let source_node_index = route_data.nodes.findIndex(x => x.id == data.source);
+                let created_node_route_id = random_num()
+                routeElements[route_index].nodes.splice(source_node_index + 1, 0, { id: created_node_route_id.toString(), data: { type: 'delay', label: (<><Node id={created_node_route_id.toString()} /> </>) }, position },)
+                addroute(routeElements)
+                addUsers(data_convert(routeElements))
+                setModalShow(false);
+            }
+
         }
 
         return (
@@ -111,6 +167,7 @@ const Edge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPo
     return (
         <g>
             <path
+                fill="none"
                 id={id}
                 style={style}
                 className="react-flow__edge-path"
@@ -125,13 +182,40 @@ const Edge = ({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPo
 const mapDispatchToProps = dispatch => {
     return {
         addUsers: (userData) => dispatch(fetchUsersSuccess(userData)),
+        addroute: (routeData) => dispatch(fetchroute(routeData)),
     }
 }
 const mapStateToProps = state => {
     return {
-        userData: state.user.users
+        userData: state.user.users,
+        route: state.user.route
     }
 }
 export default connect(
     mapStateToProps, mapDispatchToProps,
 )(Edge)
+
+
+// let source_node_index = route_data.nodes.findIndex(x => x.id == data.source);
+// let existing_nodes_array = [];
+
+// for (let i = 0; i <= source_node_index; i++) {
+// console.log(route_data.nodes[i]);
+    
+//     existing_nodes_array.push(route_data.nodes[i])
+
+// }
+// console.log(existing_nodes_array);
+// routeElements[route_index].nodes.splice(0, source_node_index + 1)
+
+// let created_node_route_id = random_num(), created_exit_route_id = random_num(), created_node_id = random_num(), created_exit_id = random_num()
+// existing_nodes_array.push({ id: created_node_id.toString(), data: { type: 'split', settings: { true_path: route_data.route_id.toString(), false_path: created_exit_route_id.toString() }, label: (<><Handle id={created_node_id.toString()} /></>) }, position })
+
+// routeElements.push({ "route_id": created_node_route_id, "nodes": existing_nodes_array },
+//     { "route_id": created_exit_route_id, "nodes": [{ id: created_exit_id.toString(), data: { type: 'exit', label: (<>EXIT</>) }, position, style: { width: '55px' } }] },
+// )
+// let source_route_data = routeElements.find(x => x.nodes.find(y => y.id == source_element_id.source));
+// let source_node_data = source_route_data.nodes.find(x => x.id == source_element_id.source); 
+// let source_route_index = routeElements.findIndex(x => x.nodes.find(y => y.id == source_element_id.source));
+// let source_route_node_index = source_route_data.nodes.findIndex(x => x.id == source_element_id.source);
+// routeElements[source_route_index].nodes[source_route_node_index] = { id: source_node_data.id, data: { type: 'split', settings: { true_path: source_element_id.sourceHandle === 'a' ? created_node_route_id.toString() : source_node_data.data.settings.false_path, false_path: source_element_id.sourceHandle === 'b' ? created_node_route_id.toString() : source_node_data.data.settings.false_path }, label: (<><Handle id={source_node_data.id} /></>) }, position }

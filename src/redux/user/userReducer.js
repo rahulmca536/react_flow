@@ -1,5 +1,5 @@
 import {
-  FETCH_USERS_SUCCESS,
+  FETCH_USERS_SUCCESS,FETCH_ROUTE_ARRAY
 } from './userTypes'
 
 const initialState = {
@@ -16,6 +16,13 @@ const reducer = (state = initialState, action) => {
         ...state,
         loading: false,
         users: action.payload,
+        error: ''
+      }
+      case FETCH_ROUTE_ARRAY: 
+      return {
+        ...state,
+        loading: false,
+        route: action.payload,
         error: ''
       }
     default: return state
