@@ -10,7 +10,7 @@ const Layout = (elements) => {
     dagreGraph.setGraph({ align: 'UL' });
     elements.forEach((el) => {
         if (isNode(el)) {
-            dagreGraph.setNode(el.id, { width: 150, height: 50 });
+            dagreGraph.setNode(el.id, { width: 150, height: 65 });
         } else {
             dagreGraph.setEdge(el.source, el.target);
         }

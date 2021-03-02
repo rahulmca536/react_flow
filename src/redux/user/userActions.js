@@ -1,6 +1,6 @@
 import {
 
-  FETCH_USERS_SUCCESS,FETCH_ROUTE_ARRAY
+  FETCH_USERS_SUCCESS,FETCH_ROUTE_ARRAY, TOGGLE_SHOW
 
 } from './userTypes'
 
@@ -16,6 +16,12 @@ export const addroute = (data) => {
     dispatch(fetchroute(data))
   }
 }
+export const toggle = (data) => {
+
+  return (dispatch) => {
+    dispatch(fetchtoggle(data))
+  }
+}
 
 export const fetchUsersSuccess = data => {
   return {
@@ -26,6 +32,12 @@ export const fetchUsersSuccess = data => {
 export const fetchroute = data => {
   return {
     type: FETCH_ROUTE_ARRAY,
+    payload: data
+  }
+}
+export const fetchtoggle = data => {
+  return {
+    type: TOGGLE_SHOW,
     payload: data
   }
 }

@@ -2,12 +2,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { fetchroute, fetchUsersSuccess,fetchtoggle } from '../redux'
 import data_convert from './data_convert';
-import Clone from './Clone';
+import Node from './Node';
 import { Handle } from 'react-flow-renderer';
 import {Dropdown,Container,Row,Col} from "react-bootstrap";
 
 const position = { x: 0, y: 0 };
-function Node({ id,data, userData, addUsers,route,addroute,toggle}) {
+function Test({ id,data, userData, addUsers,route,addroute,toggle}) {
 
 
   const Delete = id => {
@@ -21,8 +21,6 @@ toggle()
   }
   const clone = id =>{
 
-
-
     function random_num() {
       var result           = '';
       var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -32,7 +30,8 @@ toggle()
       }
       return result;
   }
-
+  console.log(route);
+  // let routeElements = [...route]
 
         let route_data = route.find(x => x.nodes.find(y => y.id == id)); 
         let route_index = route.findIndex(x => x.nodes.find(y => y.id == id));
@@ -41,9 +40,9 @@ toggle()
         if(node_data.data.type === "email"){
         let created_node_route_id = random_num()
           if(node_data.subject){
-            route[route_index].nodes.splice(source_node_index + 1, 0, { id: created_node_route_id.toString(), data: { type: 'email', label: (<><Clone id={created_node_route_id.toString()} data={"email"} /> </>) }, position, subject:node_data.subject },)
+            route[route_index].nodes.splice(source_node_index + 1, 0, { id: created_node_route_id.toString(), data: { type: 'email', label: (<><Node id={created_node_route_id.toString()} data={"email"} /> </>) }, position, subject:node_data.subject },)
           }else{
-            route[route_index].nodes.splice(source_node_index + 1, 0, { id: created_node_route_id.toString(), data: { type: 'email', label: (<><Clone id={created_node_route_id.toString()} data={"email"} /> </>) }, position },)
+            route[route_index].nodes.splice(source_node_index + 1, 0, { id: created_node_route_id.toString(), data: { type: 'email', label: (<><Node id={created_node_route_id.toString()} data={"email"} /> </>) }, position },)
           }
           console.log(route[route_index].nodes[source_node_index+1]);
           addroute(route)
@@ -52,9 +51,9 @@ toggle()
         if(node_data.data.type === "delay"){
         let created_node_route_id = random_num()
           if(node_data.delay || node_data.duration){
-            route[route_index].nodes.splice(source_node_index + 1, 0, { id: created_node_route_id.toString(), data: { type: 'delay', label: (<><Clone id={created_node_route_id.toString()} data={"delay"} /> </>) }, position, delay:node_data.delay, duration:node_data.duration},)
+            route[route_index].nodes.splice(source_node_index + 1, 0, { id: created_node_route_id.toString(), data: { type: 'delay', label: (<><Node id={created_node_route_id.toString()} data={"delay"} /> </>) }, position, delay:node_data.delay, duration:node_data.duration},)
           }else{
-            route[route_index].nodes.splice(source_node_index + 1, 0, { id: created_node_route_id.toString(), data: { type: 'delay', label: (<><Clone id={created_node_route_id.toString()} data={"delay"} /> </>) }, position },)
+            route[route_index].nodes.splice(source_node_index + 1, 0, { id: created_node_route_id.toString(), data: { type: 'delay', label: (<><Node id={created_node_route_id.toString()} data={"delay"} /> </>) }, position },)
           }
           console.log(route[route_index].nodes[source_node_index+1]);
           addroute(route)
@@ -130,5 +129,5 @@ const mapStateToProps = state => {
 }
 export default connect(
   mapStateToProps, mapDispatchToProps,
-)(Node)
+)(Test)
 

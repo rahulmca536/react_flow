@@ -1,5 +1,5 @@
 import {
-  FETCH_USERS_SUCCESS,FETCH_ROUTE_ARRAY
+  FETCH_USERS_SUCCESS,FETCH_ROUTE_ARRAY,TOGGLE_SHOW
 } from './userTypes'
 
 const initialState = {
@@ -23,6 +23,13 @@ const reducer = (state = initialState, action) => {
         ...state,
         loading: false,
         route: action.payload,
+        error: ''
+      }
+      case TOGGLE_SHOW: 
+      return {
+        ...state,
+        loading: false,
+        toggle: action.payload,
         error: ''
       }
     default: return state

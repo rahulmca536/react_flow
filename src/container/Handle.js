@@ -1,11 +1,20 @@
-import React from 'react'
+import React, { useState, } from 'react';
 import { connect } from 'react-redux'
-import { fetchroute, fetchUsersSuccess } from '../redux'
+import { fetchroute, fetchUsersSuccess,fetchtoggle} from '../redux'
 import { Handle } from 'react-flow-renderer';
-import { Test } from './Test'
+import { Dropdown, Container, Row, Col } from "react-bootstrap";
+import { Modal } from 'react-bootstrap';
 
+import { MdFilterList } from "react-icons/md";
+import { ImPower } from "react-icons/im";
 import data_convert from './data_convert';
-function handle({ data, id, userData, addUsers, route, addroute }) {
+import Properties from './properties';
+import { Rule } from 'json-rules-engine';
+function Handlef({ data, id, rule, userData, addUsers, route, addroute,toggle}) {
+  const [modalShow, setModalShow] = useState(false);
+
+
+
   const position = { x: 0, y: 0 };
 
   const handleDeleteyes = id => {
@@ -79,7 +88,7 @@ function handle({ data, id, userData, addUsers, route, addroute }) {
     }
     addroute(route)
     addUsers(data_convert(route))
-
+    toggle()
   }
 
   const handleDeleteno = id => {
@@ -109,7 +118,7 @@ function handle({ data, id, userData, addUsers, route, addroute }) {
 
       let source_route_data = route.find(x => x.nodes.find(y => y.id == edge_source_data.source));
       let source_route_data_index = route.findIndex(x => x.nodes.find(y => y.id == edge_source_data.source));
-      let source_data = source_route_data.nodes.find(x => x.id == edge_source_data.source); 
+      let source_data = source_route_data.nodes.find(x => x.id == edge_source_data.source);
       let source_data_index = source_route_data.nodes.findIndex(x => x.id == edge_source_data.source);
       route[source_route_data_index].nodes[source_data_index] = {
         id: source_data.id, data: {
@@ -152,26 +161,119 @@ function handle({ data, id, userData, addUsers, route, addroute }) {
 
     addroute(route)
     addUsers(data_convert(route))
+    toggle()
+  }
+  // console.log(rule.event.type);
+  const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
+    <a
+      href=""
+      ref={ref}
+      onClick={(e) => {
+        e.preventDefault();
+        onClick(e);
+      }}
+    >
+
+      <span className="threedots" />
+    </a>
+  ));
+
+  const property = (rule) => {
+    const { Engine } = require('json-rules-engine')
+    let engine = new Engine()
+    engine.addRule({
+      conditions: {
+        any: [{
+          all: [{
+            fact: 'gameDuration',
+            operator: 'equal',
+            value: 40
+          }, {
+            fact: 'personalFoulCount',
+            operator: 'greaterThanInclusive',
+            value: 5
+          }]
+        }, {
+          all: [{
+            fact: 'gameDuration',
+            operator: 'equal',
+            value: 48
+          }, {
+            fact: 'personalFoulCount',
+            operator: 'greaterThanInclusive',
+            value: 6
+          }]
+        }]
+      },
+      event: {  // define the event to fire when the conditions evaluate truthy
+        type: 'fouledOut',
+        params: {
+          message: 'Player has fouled out!'
+        }
+      }
+    })
+    engine
+      .run(rule)
+      .then(({ events }) => {
+        events.map(event => console.log(event.params.message))
+      })
+  }
+  function MyVerticallyCenteredModal(props) {
+    return (
+      <Modal
+        {...props}
+        size="md"
+      >
+        <Modal.Body>
+          <div className="container-fluid">
+            <center>
+              <img src="../retainful_true.png" widhth="100px" height="150px" alt="logo" onClick={() => handleDeleteyes(props.data.id)} /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <img src="../retainful_false.png" widhth="100px" height="150px" alt="logo" onClick={() => handleDeleteno(props.data.id)} />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <img src="../retainful_both.png" widhth="100px" height="150px" alt="logo" />
+            </center>
+          </div>
+        </Modal.Body>
+      </Modal>
+    );
   }
 
 
   return (
-    <>
+    <div >
       <Handle
         type="target"
         position="top"
         onConnect={(params) => console.log('handle onConnect', params)}
-        style={{ background: '#fff' }}
+      // style={{ background: '#fff' }}
       />
-      <>
-        <div style={{ position: 'relative' }}>
-          <small> <button onClick={() => handleDeleteyes(id)}>Delete yes</button></small>
-          <small> <button onClick={() => handleDeleteno(id)}>Delete no</button></small>
+     
+        <div style={{ position: 'relative' }} onClick={() =><Properties data={"sdsdd"}/>}>
 
+          <Container>
+            <Row>
+              <Col xs={6} ><p >Split</p></Col>
+
+              <Col xs={6}>
+                <Dropdown>
+                  <Dropdown.Toggle as={CustomToggle} />
+                  <Dropdown.Menu size="sm" title="">
+                    {/* <Dropdown.Header>Options</Dropdown.Header> */}
+                    <Dropdown.Item onClick={() => setModalShow(true)}> Delete</Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+                <MyVerticallyCenteredModal
+                  show={modalShow}
+                  data={{ "id": id }}
+                  onHide={() => setModalShow(false)}
+                  aria-labelledby="example-custom-modal-styling-title"
+                />
+              </Col>
+            </Row>
+          </Container>
           <div style={{ "position": "absolute", "bottom": "-33px", "right": "55px", "background": "white" }}>Yes</div>
           <div style={{ "position": "absolute", "bottom": "-33px", "right": "5px", "background": "white" }}>NO</div>
         </div>
-      </>
+  
       <Handle
         type="source"
         position="bottom"
@@ -181,16 +283,17 @@ function handle({ data, id, userData, addUsers, route, addroute }) {
         type="source"
         position="bottom"
         id="b"
-        style={{ background: '#fff', left: 120 }}
+        style={{ left: 120 }}
       />
-    </>
+    </div>
   )
 }
 
 const mapDispatchToProps = dispatch => {
   return {
     addUsers: (userData) => dispatch(fetchUsersSuccess(userData)),
-    addroute: (routeData) => dispatch(fetchroute(routeData))
+    addroute: (routeData) => dispatch(fetchroute(routeData)),
+    toggle: (Data) => dispatch(fetchtoggle(Data))
   }
 }
 const mapStateToProps = state => {
@@ -201,4 +304,4 @@ const mapStateToProps = state => {
 }
 export default connect(
   mapStateToProps, mapDispatchToProps,
-)(handle)
+)(Handlef)

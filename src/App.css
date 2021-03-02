@@ -1,5 +1,5 @@
 .App {
-  /* text-align: center; */
+  text-align: center;
 }
 
 .App-logo {
@@ -47,3 +47,7 @@
   height: 175px;
 } */
 
+.threedots:after {
+  content: "\2026";
+  font-size: 20px;
+}
