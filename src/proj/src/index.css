@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* @import "//netdna.bootstrapcdn.com/font-awesome/3.0/css/font-awesome.css"; */
+
+.mainLoginInput{
+  outline: none;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  font-size: 20px;
+  border-color: rgb(241, 224, 224);
+  border-style: groove;
+  margin-right: 8px;
+}
+
+.mainLoginInput::-webkit-input-placeholder { 
+font-family: FontAwesome;
+font-weight: normal;
+overflow: visible;
+vertical-align: top;
+display: inline-block !important;
+padding-left: 5px;
+padding-top: 2px;
+color: rgb(82, 82, 82);
+}
+
+.grecaptcha-badge { opacity:0;}
+
